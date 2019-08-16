@@ -13,7 +13,7 @@
 char *command_arr[] = {
     // "cd",
     "exit",
-    // "pwd",
+    "pwd",
     "echo", 
     // "ls", 
     "quit"
@@ -24,11 +24,11 @@ char* root;
 // int shell_cd (char **args);
 int shell_exit (char **args);
 int shell_quit(char **args);
-// int shell_pwd (char **args);
+int shell_pwd (char **args);
 int shell_echo (char **args);
 // int shell_ls (char **args);
 
-int (*functions[])(char**) = {&shell_exit, &shell_echo, &shell_quit};
+int (*functions[])(char**) = {&shell_exit, &shell_pwd, &shell_echo, &shell_quit};
 
 int shell_exit(char** args) {
     exit(1);
@@ -44,6 +44,25 @@ int shell_echo(char** args) {
         printf("%s ", args[i]);
     }
     printf("\n");
+    return 1;
+}
+
+int shell_pwd(char** args) {
+    int num_args = 0;
+
+    for (int i = 0; args[i] != NULL; i++) {
+        num_args++;
+    }
+
+    if (num_args > 1) {
+        fprintf(stdout, "Too Many Arguments\n");
+        return 0;
+    }
+
+    char *cwd = (char*) malloc(sizeof(char) * 512);
+    getcwd(cwd, 512);
+    fprintf(stdout, "%s\n", cwd);
+    free(cwd);
     return 1;
 }
 
@@ -74,7 +93,6 @@ void shell_loop(void) {
         int i = 0;
         while (i < sizeof(command_arr) / sizeof(char*)) {
             if (strcmp(command_arr[i], comm_tokens[0]) == 0) {
-                // printf("%s\n", command_arr[i]);
                 break;
             }
             i++;
@@ -87,5 +105,5 @@ void shell_loop(void) {
 int main(void) {
     root = getenv("PWD");
     shell_loop();
-    // PrintShellPrompt(root);
+    return 0;
 }
