@@ -7,64 +7,38 @@
 #include "pathManip.c"
 #include "getCommand.c"
 #include "utils.c"
+#include "shell_echo.c"
+#include "shell_pwd.c"
+#include "shell_cd.c"
 
 #define ll long long
 
 char *command_arr[] = {
-    // "cd",
+    "cd",
     "exit",
     "pwd",
     "echo", 
-    // "ls", 
+    // "ls",
     "quit"
 };
 
 
 char* root;
 // int shell_cd (char **args);
-int shell_exit (char **args);
-int shell_quit(char **args);
-int shell_pwd (char **args);
-int shell_echo (char **args);
+int shell_exit (char **args, char *root);
+int shell_quit(char **args, char *root);
 // int shell_ls (char **args);
 
-int (*functions[])(char**) = {&shell_exit, &shell_pwd, &shell_echo, &shell_quit};
+int (*functions[])(char**, char*) = {&shell_cd, &shell_exit, &shell_pwd, &shell_echo, &shell_quit};
 
-int shell_exit(char** args) {
+int shell_exit(char** args, char *root) {
     exit(1);
 }
 
-int shell_quit(char** args) {
+int shell_quit(char** args, char *root) {
     exit(1);
 }
 
-int shell_echo(char** args) {
-    for (int i = 1; args[i] !=  NULL; i++) {
-        remove_quotes(args[i], '\"');
-        printf("%s ", args[i]);
-    }
-    printf("\n");
-    return 1;
-}
-
-int shell_pwd(char** args) {
-    int num_args = 0;
-
-    for (int i = 0; args[i] != NULL; i++) {
-        num_args++;
-    }
-
-    if (num_args > 1) {
-        fprintf(stdout, "Too Many Arguments\n");
-        return 0;
-    }
-
-    char *cwd = (char*) malloc(sizeof(char) * 512);
-    getcwd(cwd, 512);
-    fprintf(stdout, "%s\n", cwd);
-    free(cwd);
-    return 1;
-}
 
 char* PrintShellPrompt(char* root) {
     char* hostname = (char*)malloc(1024);
@@ -97,7 +71,7 @@ void shell_loop(void) {
             }
             i++;
         }
-        int num = (*functions[i])(comm_tokens);
+        int num = (*functions[i])(comm_tokens, root);
 
     }
 }

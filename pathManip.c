@@ -5,17 +5,20 @@ char* getPath(char* cwd, char* root) {
 
     char* path = (char*)malloc(8192);
 
-    if (root_size > cwd_size) {
-        path[0] = '~';
-        path[1] = '/';
-
-        for (int i = 0; i < root_size - cwd_size - 1; i++) {
-            path[i + 2] = cwd[root_size + i + 1];
-        }
+    if (strstr(root, cwd) && root_size != cwd_size) {
+        path = cwd;
     }
-    else if (root_size == cwd_size) {
+    else if (strstr(cwd, root) && root_size == cwd_size) {
         path[0] = '~';
         path[1] = '\0';
+
+    }
+    else if (strstr(cwd, root) && root_size != cwd_size) {
+        path[0] = '~';
+        path[1] = '/';
+        for (int i = 0; i < cwd_size - root_size - 1; i++) {
+            path[i + 2] = cwd[root_size + i + 1];
+        }
     }
     else {
         path = cwd;
