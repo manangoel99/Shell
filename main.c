@@ -50,7 +50,7 @@ char* PrintShellPrompt(char* root) {
 
     char* path = getPath(cwd, root);
 
-    printf("%s@%s %s $ ", username, hostname, path);
+    printf("<%s@%s %s> $ ", username, hostname, path);
 }
 
 void shell_loop(void) {
