@@ -10,6 +10,7 @@
 #include "shell_echo.c"
 #include "shell_pwd.c"
 #include "shell_cd.c"
+#include "shell_ls.c"
 
 #define ll long long
 
@@ -18,7 +19,7 @@ char *command_arr[] = {
     "exit",
     "pwd",
     "echo", 
-    // "ls",
+    "ls",
     "quit"
 };
 
@@ -29,7 +30,7 @@ int shell_exit (char **args, char *root);
 int shell_quit(char **args, char *root);
 // int shell_ls (char **args);
 
-int (*functions[])(char**, char*) = {&shell_cd, &shell_exit, &shell_pwd, &shell_echo, &shell_quit};
+int (*functions[])(char**, char*) = {&shell_cd, &shell_exit, &shell_pwd, &shell_echo, &shell_ls, &shell_quit};
 
 int shell_exit(char** args, char *root) {
     exit(1);
