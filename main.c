@@ -11,6 +11,7 @@
 #include "shell_pwd.c"
 #include "shell_cd.c"
 #include "shell_ls.c"
+#include "run_command.c"
 
 #define ll long long
 
@@ -66,14 +67,21 @@ void shell_loop(void) {
         char** comm_tokens = SplitCommand(comm);
 
         int i = 0;
-        while (i < sizeof(command_arr) / sizeof(char*)) {
+        int flag = 0;
+        // printf("%u\n", sizeof(char*));
+        while (i < sizeof(command_arr) / sizeof(char*) - 1) {
             if (strcmp(command_arr[i], comm_tokens[0]) == 0) {
-                break;
+                int num = (*functions[i])(comm_tokens, root);
+                flag = 1;
             }
             i++;
+            // printf("%d\n", i);
         }
-        int num = (*functions[i])(comm_tokens, root);
+        // printf("%d\n", flag);
+        if (flag == 0){
+            int num = run_command(comm_tokens);
 
+        }
     }
 }
 
