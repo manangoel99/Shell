@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
+#include "shell.h"
 
 #include "pathManip.c"
 #include "getCommand.c"
@@ -23,6 +24,19 @@ char *command_arr[] = {
     "ls",
     "quit"
 };
+
+struct p processes[10000];
+
+void sigintHandler (int sig_num)
+{
+	signal(SIGINT, sigintHandler);
+	fflush(stdout);
+}
+
+void sigtstpHandler(int sig_num) 
+{ 
+	signal(SIGTSTP, sigtstpHandler);
+}
 
 
 char* root;
@@ -62,22 +76,54 @@ void shell_loop(void) {
     int state;
 
     while(1) {
+
+        int pid, status;
+
+        while((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0) {
+            char* pname;
+            // printf("%d\n", pid);
+
+            if (WIFEXITED(status)) {
+                int la = 0;
+                while (la < running_proc_num) {
+                    pname = processes[la].pname;
+                    processes[la].pid = -1;
+
+                    fprintf(stderr, "Process %s:%d exited normally\n", pname, processes[la].pid);
+                    break;
+                    la++;
+
+                }
+            }
+            if (WIFSIGNALED(status)) {
+                int la = 0;
+                while (la < running_proc_num) {
+                    pname = processes[la].pname;
+                    processes[la].pid = -1;
+
+                    fprintf(stderr, "Process %s:%d exited with signal\n", pname, processes[la].pid);
+                    break;
+                    la++;
+
+                    la++;
+                }
+            }
+        }
+
+
         PrintShellPrompt(root);
         char* comm = getCommands();
         char** comm_tokens = SplitCommand(comm);
 
         int i = 0;
         int flag = 0;
-        // printf("%u\n", sizeof(char*));
         while (i < sizeof(command_arr) / sizeof(char*) - 1) {
             if (strcmp(command_arr[i], comm_tokens[0]) == 0) {
                 int num = (*functions[i])(comm_tokens, root);
                 flag = 1;
             }
             i++;
-            // printf("%d\n", i);
         }
-        // printf("%d\n", flag);
         if (flag == 0){
             int num = run_command(comm_tokens);
 
@@ -86,6 +132,10 @@ void shell_loop(void) {
 }
 
 int main(void) {
+
+    signal(SIGINT, sigintHandler);
+	signal(SIGTSTP, sigtstpHandler);
+
     root = getenv("PWD");
     shell_loop();
     return 0;

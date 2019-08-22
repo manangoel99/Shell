@@ -1,3 +1,8 @@
+#include "shell.h"
+
+int running_proc_num = 0;
+struct p processes[10000];
+
 int run_command(char **args) {
 
     int background = 0, i = 0, j = 0;
@@ -22,7 +27,6 @@ int run_command(char **args) {
             args1[k] = args[k];
         }
     }
-    // printf("%d\n", !background);
     pid = fork();
     if (pid < 0) {
         perror("Error");
@@ -54,6 +58,10 @@ int run_command(char **args) {
         // }
     }
     else {
+        processes[running_proc_num].pname = (char*)malloc(sizeof(args[0]));
+        processes[running_proc_num].pname = args[0];
+        // strcpy(processes[running_proc_num].pname, args[0]);
+        processes[running_proc_num++].pid = pid;
     }
 
 }
