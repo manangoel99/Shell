@@ -87,9 +87,10 @@ void shell_loop(void) {
                 int la = 0;
                 while (la < running_proc_num) {
                     pname = processes[la].pname;
+                    fprintf(stderr, "Process %s:%d exited normally\n", pname, processes[la].pid);
+
                     processes[la].pid = -1;
 
-                    fprintf(stderr, "Process %s:%d exited normally\n", pname, processes[la].pid);
                     break;
                     la++;
 
@@ -99,9 +100,10 @@ void shell_loop(void) {
                 int la = 0;
                 while (la < running_proc_num) {
                     pname = processes[la].pname;
+                    fprintf(stderr, "Process %s:%d exited with signal\n", pname, processes[la].pid);
+
                     processes[la].pid = -1;
 
-                    fprintf(stderr, "Process %s:%d exited with signal\n", pname, processes[la].pid);
                     break;
                     la++;
 
