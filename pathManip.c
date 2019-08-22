@@ -16,9 +16,11 @@ char* getPath(char* cwd, char* root) {
     else if (strstr(cwd, root) && root_size != cwd_size) {
         path[0] = '~';
         path[1] = '/';
-        for (int i = 0; i < cwd_size - root_size - 1; i++) {
+        int i;
+        for (i = 0; i < cwd_size - root_size - 1; i++) {
             path[i + 2] = cwd[root_size + i + 1];
         }
+        path[i + 2] = '\0';
     }
     else {
         path = cwd;

@@ -12,6 +12,7 @@
 #include "shell_pwd.c"
 #include "shell_cd.c"
 #include "shell_ls.c"
+#include "shell_pinfo.c"
 #include "run_command.c"
 
 #define ll long long
@@ -22,7 +23,8 @@ char *command_arr[] = {
     "pwd",
     "echo", 
     "ls",
-    "quit"
+    "quit",
+    "pinfo"
 };
 
 struct p processes[10000];
@@ -40,12 +42,11 @@ void sigtstpHandler(int sig_num)
 
 
 char* root;
-// int shell_cd (char **args);
+
 int shell_exit (char **args, char *root);
 int shell_quit(char **args, char *root);
-// int shell_ls (char **args);
 
-int (*functions[])(char**, char*) = {&shell_cd, &shell_exit, &shell_pwd, &shell_echo, &shell_ls, &shell_quit};
+int (*functions[])(char**, char*) = {&shell_cd, &shell_exit, &shell_pwd, &shell_echo, &shell_ls, &shell_quit, &shell_pinfo};
 
 int shell_exit(char** args, char *root) {
     exit(1);
@@ -106,8 +107,6 @@ void shell_loop(void) {
 
                     break;
                     la++;
-
-                    la++;
                 }
             }
         }
@@ -119,7 +118,7 @@ void shell_loop(void) {
 
         int i = 0;
         int flag = 0;
-        while (i < sizeof(command_arr) / sizeof(char*) - 1) {
+        while (i < sizeof(command_arr) / sizeof(char*)) {
             if (strcmp(command_arr[i], comm_tokens[0]) == 0) {
                 int num = (*functions[i])(comm_tokens, root);
                 flag = 1;
