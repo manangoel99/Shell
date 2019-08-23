@@ -14,7 +14,7 @@
 #include "shell_ls.c"
 #include "shell_pinfo.c"
 #include "run_command.c"
-// #include "shell_history.c"
+#include "shell_history.c"
 
 #define ll long long
 
@@ -26,7 +26,7 @@ char *command_arr[] = {
     "ls",
     "quit",
     "pinfo",
-    // "history",
+    "history",
 };
 
 struct p processes[10000];
@@ -48,7 +48,7 @@ char* root;
 int shell_exit (char **args, char *root);
 int shell_quit(char **args, char *root);
 
-int (*functions[])(char**, char*) = {&shell_cd, &shell_exit, &shell_pwd, &shell_echo, &shell_ls, &shell_quit, &shell_pinfo};
+int (*functions[])(char**, char*) = {&shell_cd, &shell_exit, &shell_pwd, &shell_echo, &shell_ls, &shell_quit, &shell_pinfo, &shell_history};
 
 int shell_exit(char** args, char *root) {
     exit(1);
