@@ -149,25 +149,32 @@ void shell_loop(void) {
 
         strcpy(temp, root);
 
+
         strcat(temp, "/.history");
         char str[1000];        
         FILE* hist_file = fopen(temp, "r");
-
-        while (fgets(str, 1000, hist_file) != NULL);
+        int size = 0;
+        int last_num;
+        char* token;
+        if (hist_file != NULL) {
+            while (fgets(str, 1000, hist_file) != NULL);
         
 
-        fseek(hist_file, 0, SEEK_END);
-        int size = ftell(hist_file);
-        int last_num;
+            fseek(hist_file, 0, SEEK_END);
+            size = ftell(hist_file);
+            // last_num;
+            token = strtok(str, " ");
+            last_num = atoi(token);
+            fclose(hist_file);
+
+        }
 
         if (size == 0) {
             last_num = 0;
         }
 
-        char* token = strtok(str, " ");
-        last_num = atoi(token);
+        
 
-        fclose(hist_file);
 
         FILE* hist_file_write = fopen(temp, "a");
         fprintf(hist_file_write, "%d %s\n", last_num + 1, command);
