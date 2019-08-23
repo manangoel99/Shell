@@ -35,8 +35,19 @@ int nightswatch(char** args, char* root) {
         opt_index = 1;
     }
     if (args[opt_index] != NULL) {
+		printf("%s\n", args[opt_index]);
 	    WINDOW* curr = initscr();
 	    WINDOW * win; 
+
+		int flag_interrupt = 0, flag_dirty = 0;
+
+		if (strcmp(args[opt_index], "interrupt") == 0) {
+			flag_interrupt = 1;
+		}
+
+		if (strcmp(args[opt_index], "dirty") == 0) {
+			flag_dirty = 1;
+		}
 
 	    win = newwin(1280,720,1,1);
 
@@ -51,11 +62,25 @@ int nightswatch(char** args, char* root) {
 	    char *buffer;
 	    char* heading = (char*)malloc(200);
 
-		sprintf(heading, "NIGHTSWATCH INTERRUPT: %ds\n", num_secs);
+		char* file_path;
+
+		if (flag_interrupt == 1) {
+
+			sprintf(heading, "NIGHTSWATCH INTERRUPT: %ds\n", num_secs);
+			file_path = (char*)malloc(sizeof("/proc/interrupts"));
+        	strcpy(file_path, "/proc/interrupts");
+
+		}
+
+		if (flag_dirty == 1) {
+			sprintf(heading, "NIGHTSWATCH DIRTY: %ds\n", num_secs);
+			file_path = (char*)malloc(sizeof("/proc/meminfo"));
+        	strcpy(file_path, "/proc/meminfo");
+		}
+
         int line_nums = 5;
 
 	    char *cpuinfo;
-        char file_path[] = "/proc/interrupts";
 
 	    FILE* fd = fopen(file_path,"r");
 	    getline(&cpuinfo, &cpu_size, fd);
@@ -71,7 +96,7 @@ int nightswatch(char** args, char* root) {
 	    	if((current_time - start_time) % num_secs == 0 && current_time != prev_time)
 	    	{ 
 	    		char *data;
-	    		FILE* fd1 = fopen("/proc/interrupts", "r");
+	    		FILE* fd1 = fopen(file_path, "r");
 				prev_time = current_time;
 				line_nums++;
 	    		size_t nowbufsize = 0;
@@ -79,8 +104,15 @@ int nightswatch(char** args, char* root) {
 	    		fseek(fd1, 0, SEEK_SET);
 	    		// getline(&data, &nowbufsize, fd1);		
 	    		// getline(&data, &nowbufsize, fd1);
-				int m = 0;			
-				while (m < 3) {
+				int m = 0;
+				int times = 0;
+
+				if (flag_interrupt == 1)
+					times = 3;
+				else if (flag_dirty == 1)
+					times = 17;
+
+				while (m < times) {
 		    		getline(&data, &nowbufsize, fd1);
 					m++;
 				}
@@ -106,13 +138,6 @@ int nightswatch(char** args, char* root) {
         return 1;
     }
 
-    else if (strcmp(args[opt_index], "interrupt") == 0) {
-        printf("YAY Interrupt\n");
-        
-    }
-    else if (strcmp(args[opt_index], "dirty") == 0) {
-        printf("YAY Dirty\n");
-    }
     else {
         fprintf(stderr, "nightswatch: Use nightswatch [options] <valid command>\nHere valid commands are 'interrupt' and 'dirty'\n");
         return -1;

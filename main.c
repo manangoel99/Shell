@@ -118,6 +118,9 @@ void shell_loop(void) {
 
         PrintShellPrompt(root);
         char* comm = getCommands();
+        if (strlen(comm) == 0) {
+            continue;
+        }
         char** comm_tokens = SplitCommand(comm);
 
         char* command = (char*)malloc(10000);

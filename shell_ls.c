@@ -103,7 +103,7 @@ void printInfo(char* name) {
     fprintf(stdout, (f_stat.st_mode & S_IWOTH) ? "w":"-");
     fprintf(stdout, (f_stat.st_mode & S_IXOTH) ? "x\t":"-\t");
 
-    fprintf(stdout, "%d\t", f_stat.st_nlink);
+    fprintf(stdout, "%lu\t", f_stat.st_nlink);
 
     struct passwd *own = getpwuid(f_stat.st_uid);
     struct group *grp = getgrgid(f_stat.st_gid);
@@ -187,7 +187,6 @@ int shell_ls(char** args, char* root) {
 
             if (strlen(args[i]) == 1) {
                 file_read = 1;
-                // perror("Error");
                 fprintf(stderr, "File or Directory Does Not exist\n");
             }
         }
@@ -203,6 +202,5 @@ int shell_ls(char** args, char* root) {
         printDetails(".", flag_a, flag_l);
     }
 
-    // printf("%d\t%d\n", flag_a, flag_l);
 
 }
