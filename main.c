@@ -14,6 +14,7 @@
 #include "shell_ls.c"
 #include "shell_pinfo.c"
 #include "run_command.c"
+// #include "shell_history.c"
 
 #define ll long long
 
@@ -24,7 +25,8 @@ char *command_arr[] = {
     "echo", 
     "ls",
     "quit",
-    "pinfo"
+    "pinfo",
+    // "history",
 };
 
 struct p processes[10000];
@@ -116,6 +118,16 @@ void shell_loop(void) {
         char* comm = getCommands();
         char** comm_tokens = SplitCommand(comm);
 
+        char* command = (char*)malloc(10000);
+        strcpy(command, "");
+
+        int k = 0;
+        while(comm_tokens[k] != NULL) {
+            strcat(command, comm_tokens[k++]);
+            strcat(command, " ");
+        }
+        command[strlen(command) - 1] = '\0';
+
         int i = 0;
         int flag = 0;
         while (i < sizeof(command_arr) / sizeof(char*)) {
@@ -127,8 +139,37 @@ void shell_loop(void) {
         }
         if (flag == 0){
             int num = run_command(comm_tokens);
-
         }
+
+        char* temp = (char*)malloc(sizeof(root) + 100);
+
+        strcpy(temp, root);
+
+        strcat(temp, "/.history");
+        char str[1000];        
+        FILE* hist_file = fopen(temp, "r");
+
+        while (fgets(str, 1000, hist_file) != NULL);
+        
+
+        fseek(hist_file, 0, SEEK_END);
+        int size = ftell(hist_file);
+        int last_num;
+
+        if (size == 0) {
+            last_num = 0;
+        }
+
+        char* token = strtok(str, " ");
+        last_num = atoi(token);
+
+        fclose(hist_file);
+
+        FILE* hist_file_write = fopen(temp, "a");
+        fprintf(hist_file_write, "%d %s\n", last_num + 1, command);
+        fclose(hist_file_write);
+        free(command);
+        free(temp);
     }
 }
 
