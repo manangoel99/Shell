@@ -1,4 +1,4 @@
-#include <string.h>
+#include "pathManip.h"
 
 char* getPath(char* cwd, char* root) {
     int root_size = strlen(root), cwd_size = strlen(cwd);

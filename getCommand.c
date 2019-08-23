@@ -1,5 +1,4 @@
-#include <string.h>
-#include <stdio.h>
+#include "getCommand.h"
 #define ll long long
 
 char** SplitCommand(char* command_str) {

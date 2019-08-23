@@ -5,17 +5,16 @@
 #include <stdlib.h>
 #include "shell.h"
 
-#include "pathManip.c"
-#include "getCommand.c"
-#include "utils.c"
-#include "shell_echo.c"
-#include "shell_pwd.c"
-#include "shell_cd.c"
-#include "shell_ls.c"
-#include "shell_pinfo.c"
-#include "run_command.c"
-#include "shell_history.c"
-#include "shell_nightswatch.c"
+#include "pathManip.h"
+#include "getCommand.h"
+#include "shell_echo.h"
+#include "shell_pwd.h"
+#include "shell_cd.h"
+#include "shell_ls.h"
+#include "shell_nightswatch.h"
+#include "shell_history.h"
+#include "shell_pinfo.h"
+#include "run_command.h"
 
 #define ll long long
 

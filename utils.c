@@ -1,4 +1,4 @@
-#include <string.h>
+#include "utils.h"
 
 void remove_quotes(char* str, char c) {
     char *pr = str, *pw = str;

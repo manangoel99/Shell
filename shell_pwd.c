@@ -1,4 +1,4 @@
-int shell_pwd (char **args, char *root);
+#include "shell_pwd.h"
 
 int shell_pwd(char** args, char *root) {
     int num_args = 0;

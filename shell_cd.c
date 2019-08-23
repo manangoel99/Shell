@@ -1,4 +1,4 @@
-int shell_cd(char **args, char* root);
+#include "shell_cd.h"
 
 int shell_cd(char** args, char* root) {
 

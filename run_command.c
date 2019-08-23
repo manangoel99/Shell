@@ -1,4 +1,5 @@
 #include "shell.h"
+#include "run_command.h"
 
 int running_proc_num = 0;
 struct p processes[10000];

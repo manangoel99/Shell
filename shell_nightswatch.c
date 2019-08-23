@@ -1,12 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-#include <curses.h>
-#include <unistd.h>
-#include <getopt.h>
-#include <time.h>
-#include <stdlib.h>
-#include <sys/ioctl.h>
-#include <termios.h>
+#include "shell_nightswatch.h"
 
 int nightswatch(char** args, char* root) {
     int args_len = 0;

@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include "shell_history.h"
 
 int shell_history(char** args, char* root) {
     // printf("HAHAH\n");
