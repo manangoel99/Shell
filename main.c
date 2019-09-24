@@ -131,11 +131,9 @@ void shell_loop(void) {
             strcpy(command, "");
 
             int l = 0;
-
+            int flag1 = 0;
             char** comm_toks = (char**)malloc(1000); 
             comm_toks = SplitCommand(comm_tokens[k]);
-
-            int flag1 = 0;
 
             while(comm_toks[l] != NULL) {
                 if (strcmp(comm_toks[l], "|") == 0 || strcmp(comm_toks[l], ">") == 0 || strcmp(comm_toks[l], ">>") == 0 || strcmp(comm_toks[l], "<") == 0) {
@@ -158,6 +156,7 @@ void shell_loop(void) {
             if (flag == 0 || flag1 == 1){
                 int num = run_command(comm_toks, root);
             }
+
 
             char* temp = (char*)malloc(sizeof(root) + 100);
 

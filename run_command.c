@@ -96,12 +96,7 @@ int run_command(char **args,char* root) {
             if (isout_p) {
                 dup2(outfd_p, 1);
             }
-
-
-            // if (execvp(kwargs[0], kwargs) < 0) {
-                // perror("Error");
-            // }
-
+            
             if (strcmp(kwargs[0], "ls") == 0) {
                 shell_ls(kwargs, root);
             }
@@ -113,6 +108,8 @@ int run_command(char **args,char* root) {
                     perror("Piping Error");
                 }
             }
+
+            
 
             if (isin_p) {
                 close(infd_p);
@@ -177,16 +174,16 @@ int run_command(char **args,char* root) {
             if (isout_p) {
                 dup2(outfd_p, 1);
             }
-
-           if (strcmp(kwargs[0], "ls") == 0) {
+            
+            if (strcmp(kwargs[0], "ls") == 0) {
                 shell_ls(kwargs, root);
             }
             else if (strcmp(kwargs[0], "echo") == 0) {
                 shell_echo(kwargs, root);
             }
             else {
-                if (execvp(kwargs[0], kwargs) == -1) {
-                    perror("Piping Error");
+                if (execvp(kwargs[0], kwargs) < 0) {
+                    perror("Error");
                 }
             }
             if (isin_p) {
