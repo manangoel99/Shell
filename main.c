@@ -134,7 +134,13 @@ void shell_loop(void) {
 
             char** comm_toks = (char**)malloc(1000); 
             comm_toks = SplitCommand(comm_tokens[k]);
+
+            int flag1 = 0;
+
             while(comm_toks[l] != NULL) {
+                if (strcmp(comm_toks[l], "|") == 0 || strcmp(comm_toks[l], ">") == 0 || strcmp(comm_toks[l], ">>") == 0 || strcmp(comm_toks[l], "<") == 0) {
+                    flag1 = 1;
+                }
                 strcat(command, comm_toks[l++]);
                 strcat(command, " ");
             }
@@ -143,13 +149,13 @@ void shell_loop(void) {
             int i = 0;
             int flag = 0;
             while (i < sizeof(command_arr) / sizeof(char*)) {
-                if (strcmp(command_arr[i], comm_toks[0]) == 0) {
+                if (strcmp(command_arr[i], comm_toks[0]) == 0 && flag1 == 0) {
                     int num = (*functions[i])(comm_toks, root);
                     flag = 1;
                 }
                 i++;
             }
-            if (flag == 0){
+            if (flag == 0 || flag1 == 1){
                 int num = run_command(comm_toks, root);
             }
 
