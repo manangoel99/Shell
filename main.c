@@ -120,67 +120,79 @@ void shell_loop(void) {
         if (strlen(comm) == 0) {
             continue;
         }
-        char** comm_tokens = SplitCommand(comm);
 
-        char* command = (char*)malloc(10000);
-        strcpy(command, "");
+        char** comm_tokens = SplitCommands(comm);
 
         int k = 0;
-        while(comm_tokens[k] != NULL) {
-            strcat(command, comm_tokens[k++]);
-            strcat(command, " ");
-        }
-        command[strlen(command) - 1] = '\0';
 
-        int i = 0;
-        int flag = 0;
-        while (i < sizeof(command_arr) / sizeof(char*)) {
-            if (strcmp(command_arr[i], comm_tokens[0]) == 0) {
-                int num = (*functions[i])(comm_tokens, root);
-                flag = 1;
+        while (comm_tokens[k] != NULL) {
+
+            char* command = (char*)malloc(1000);
+            strcpy(command, "");
+
+            int l = 0;
+
+            char** comm_toks = (char**)malloc(1000); 
+            comm_toks = SplitCommand(comm_tokens[k]);
+            while(comm_toks[l] != NULL) {
+                strcat(command, comm_toks[l++]);
+                strcat(command, " ");
             }
-            i++;
+            command[strlen(command) - 1] = '\0';
+
+            int i = 0;
+            int flag = 0;
+            while (i < sizeof(command_arr) / sizeof(char*)) {
+                if (strcmp(command_arr[i], comm_toks[0]) == 0) {
+                    int num = (*functions[i])(comm_toks, root);
+                    flag = 1;
+                }
+                i++;
+            }
+            if (flag == 0){
+                int num = run_command(comm_toks);
+            }
+
+            char* temp = (char*)malloc(sizeof(root) + 100);
+
+            strcpy(temp, root);
+
+
+            strcat(temp, "/.history");
+            char str[1000];        
+            FILE* hist_file = fopen(temp, "r");
+            int size = 0;
+            int last_num;
+            char* token;
+            if (hist_file != NULL) {
+                while (fgets(str, 1000, hist_file) != NULL);
+
+
+                fseek(hist_file, 0, SEEK_END);
+                size = ftell(hist_file);
+                // last_num;
+                token = strtok(str, " ");
+                last_num = atoi(token);
+                fclose(hist_file);
+
+            }
+
+            if (size == 0) {
+                last_num = 0;
+            }
+
+
+
+
+            FILE* hist_file_write = fopen(temp, "a");
+            fprintf(hist_file_write, "%d %s\n", last_num + 1, command);
+            fclose(hist_file_write);
+            free(command);
+            free(temp);
+
+            k++;
         }
-        if (flag == 0){
-            int num = run_command(comm_tokens);
-        }
-
-        char* temp = (char*)malloc(sizeof(root) + 100);
-
-        strcpy(temp, root);
-
-
-        strcat(temp, "/.history");
-        char str[1000];        
-        FILE* hist_file = fopen(temp, "r");
-        int size = 0;
-        int last_num;
-        char* token;
-        if (hist_file != NULL) {
-            while (fgets(str, 1000, hist_file) != NULL);
         
-
-            fseek(hist_file, 0, SEEK_END);
-            size = ftell(hist_file);
-            // last_num;
-            token = strtok(str, " ");
-            last_num = atoi(token);
-            fclose(hist_file);
-
-        }
-
-        if (size == 0) {
-            last_num = 0;
-        }
-
-        
-
-
-        FILE* hist_file_write = fopen(temp, "a");
-        fprintf(hist_file_write, "%d %s\n", last_num + 1, command);
-        fclose(hist_file_write);
-        free(command);
-        free(temp);
     }
 }
 

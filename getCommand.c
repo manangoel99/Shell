@@ -20,6 +20,23 @@ char** SplitCommand(char* command_str) {
 
 }
 
+char** SplitCommands(char* overall_str) {
+    char** tokens = (char**)malloc(sizeof(char*) * 5120);
+    char* token = strtok(overall_str, ";");
+
+    ll i = 0;
+
+    while (token != NULL) {
+        tokens[i] = (char*)malloc(sizeof(char) * 512);
+        tokens[i] = token;
+        token = strtok(NULL, ";");
+        i++;
+    }
+    tokens[i] = NULL;
+    return tokens;
+
+}
+
 
 char* getCommands() {
     ll str_size = 8192, pos = 0;
