@@ -1,5 +1,7 @@
 #include "shell.h"
 #include "run_command.h"
+#include "shell_ls.h"
+#include "shell_echo.h"
 
 int running_proc_num = 0;
 struct p processes[10000];
@@ -95,10 +97,19 @@ int run_command(char **args,char* root) {
                 dup2(outfd_p, 1);
             }
 
-
-            if (execvp(kwargs[0], kwargs) < 0) {
-                perror("Error");
+            if (strcmp(kwargs[0], "ls") == 0) {
+                shell_ls(kwargs, root);
             }
+            else if (strcmp(kwargs[0], "echo") == 0) {
+                shell_echo(kwargs, root);
+            }
+            else {
+                if (execvp(kwargs[0], kwargs) < 0) {
+                    perror("Error");
+                }
+            }
+
+            
 
             if (isin_p) {
                 close(infd_p);
@@ -128,8 +139,16 @@ int run_command(char **args,char* root) {
                             dup2(outfd_p, 1);
                         }
 
-                        if (execvp(kwargs[0], kwargs) < 0) {
-                            perror("Error");
+                        if (strcmp(kwargs[0], "ls") == 0) {
+                            shell_ls(kwargs, root);
+                        }
+                        else if (strcmp(kwargs[0], "echo") == 0) {
+                            shell_echo(kwargs, root);
+                        }
+                        else {
+                            if (execvp(kwargs[0], kwargs) < 0) {
+                                perror("Error");
+                            }
                         }
                         if (isin_p) {
                             close(infd_p);
@@ -156,8 +175,16 @@ int run_command(char **args,char* root) {
                 dup2(outfd_p, 1);
             }
 
-            if (execvp(kwargs[0], kwargs) < 0) {
-                perror("Error");
+            if (strcmp(kwargs[0], "ls") == 0) {
+                shell_ls(kwargs, root);
+            }
+            else if (strcmp(kwargs[0], "echo") == 0) {
+                shell_echo(kwargs, root);
+            }
+            else {
+                if (execvp(kwargs[0], kwargs) < 0) {
+                    perror("Error");
+                }
             }
             if (isin_p) {
                 close(infd_p);
