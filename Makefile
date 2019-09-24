@@ -1,7 +1,7 @@
 LDFLAGS=-lncurses
 
-shell: main.o shell_cd.o shell_echo.o shell_history.o shell_ls.o shell_nightswatch.o shell_pinfo.o shell_pwd.o getCommand.o pathManip.o run_command.o utils.o
-	gcc main.o shell_cd.o shell_echo.o shell_history.o shell_ls.o shell_nightswatch.o shell_pinfo.o shell_pwd.o getCommand.o pathManip.o run_command.o utils.o -o shell $(LDFLAGS) 
+shell: main.o shell_setenv.o shell_cd.o shell_echo.o shell_history.o shell_ls.o shell_nightswatch.o shell_pinfo.o shell_pwd.o getCommand.o pathManip.o run_command.o utils.o
+	gcc main.o shell_setenv.o shell_cd.o shell_echo.o shell_history.o shell_ls.o shell_nightswatch.o shell_pinfo.o shell_pwd.o getCommand.o pathManip.o run_command.o utils.o -o shell $(LDFLAGS) 
 
 main.o: main.c
 	gcc -c main.c
@@ -38,6 +38,9 @@ run_command.o: run_command.c
 
 utils.o: utils.c
 	gcc -o utils.o -c utils.c
+
+shell_setenv.o: shell_setenv.c
+	gcc -o shell_setenv.o -c shell_setenv.c
 
 clean:
 	rm -rf shell *.o

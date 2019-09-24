@@ -14,6 +14,7 @@
 #include "shell_nightswatch.h"
 #include "shell_history.h"
 #include "shell_pinfo.h"
+#include "shell_setenv.h"
 #include "run_command.h"
 
 #define ll long long
@@ -28,6 +29,8 @@ char *command_arr[] = {
     "pinfo",
     "history",
     "nightswatch",
+    "setenv",
+    "unsetenv",
 };
 
 struct p processes[10000];
@@ -49,7 +52,7 @@ char* root;
 int shell_exit (char **args, char *root);
 int shell_quit(char **args, char *root);
 
-int (*functions[])(char**, char*) = {&shell_cd, &shell_exit, &shell_pwd, &shell_echo, &shell_ls, &shell_quit, &shell_pinfo, &shell_history, &nightswatch};
+int (*functions[])(char**, char*) = {&shell_cd, &shell_exit, &shell_pwd, &shell_echo, &shell_ls, &shell_quit, &shell_pinfo, &shell_history, &nightswatch, &run_setenv, &run_unsetenv};
 
 int shell_exit(char** args, char *root) {
     exit(1);
