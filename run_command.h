@@ -14,4 +14,4 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-int run_command(char** args);
+int run_command(char** args, char* root);

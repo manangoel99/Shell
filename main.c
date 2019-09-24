@@ -150,7 +150,7 @@ void shell_loop(void) {
                 i++;
             }
             if (flag == 0){
-                int num = run_command(comm_toks);
+                int num = run_command(comm_toks, root);
             }
 
             char* temp = (char*)malloc(sizeof(root) + 100);
