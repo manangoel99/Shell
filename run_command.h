@@ -13,5 +13,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 int run_command(char** args, char* root);

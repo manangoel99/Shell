@@ -1,6 +1,5 @@
 #include "shell.h"
 #include "run_command.h"
-#include <fcntl.h>
 
 int running_proc_num = 0;
 struct p processes[10000];
@@ -108,6 +107,72 @@ int run_command(char **args,char* root) {
                 close(outfd_p);
             }
         }
+        else {
+            int i = 0;
+            while (i < args_pos - 1) {
+                int act_pipe[2];
+                int status = pipe2(act_pipe, 0);
+                    pid_t np = fork();
+
+                    if (np == 0) {
+                        dup2(act_pipe[1], 1);
+
+                        int isin_p, isout_p, infd_p, outfd_p, pos_p;
+
+                        char** kwargs = redirectCode(all_args[i], &isin_p, &isout_p, &infd_p, &outfd_p, &pos_p);
+
+                        if (isin_p) {
+                            dup2(infd_p, 0);
+                        }
+                        if (isout_p) {
+                            dup2(outfd_p, 1);
+                        }
+
+                        if (execvp(kwargs[0], kwargs) < 0) {
+                            perror("Error");
+                        }
+                        if (isin_p) {
+                            close(infd_p);
+                        }
+                        if (isout_p) {
+                            close(outfd_p);
+                        }
+                        abort();
+
+                    }
+                    dup2(act_pipe[0], 0);
+                    close(act_pipe[1]);
+
+                i++;
+            }
+            int isin_p, isout_p, infd_p, outfd_p, pos_p;
+
+            char** kwargs = redirectCode(all_args[i], &isin_p, &isout_p, &infd_p, &outfd_p, &pos_p);
+            
+            if (isin_p) {
+                dup2(infd_p, 0);
+            }
+            if (isout_p) {
+                dup2(outfd_p, 1);
+            }
+
+            if (execvp(kwargs[0], kwargs) < 0) {
+                perror("Error");
+            }
+            if (isin_p) {
+                close(infd_p);
+            }
+            if (isout_p) {
+                close(outfd_p);
+            }
+
+
+        }
+        for (int d = 0; d < args_pos; d++) {
+            free(all_args[d]);
+        }
+        free(all_args);
+        exit(1);
 
     }
     else if (pid > 0) {
