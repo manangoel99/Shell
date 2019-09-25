@@ -216,10 +216,21 @@ int run_command(char **args,char* root) {
         // }
         }
         else {
-            processes[running_proc_num].pname = (char*)malloc(sizeof(args[0]));
-            processes[running_proc_num].pname = args[0];
+            char* command = (char*)malloc(1280);
+            strcpy(command, "");
+
+            int i = 0;
+            while(args[i] != NULL) {
+                strcat(command, args[i]);
+                strcat(command, " ");
+                i++;
+            }
+
+            processes[running_proc_num].pname = (char*)malloc(sizeof(command));
+            processes[running_proc_num].pname = command;
             processes[running_proc_num].status = 0;
             processes[running_proc_num].print_status = 0;
+            processes[running_proc_num].stat = 1;
             // strcpy(processes[running_proc_num].pname, args[0]);
             processes[running_proc_num++].pid = pid;
         }

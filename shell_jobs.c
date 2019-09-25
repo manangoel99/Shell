@@ -16,6 +16,9 @@ int jobs(char** args, char* root) {
         if (processes[la].status == 0) {
             fprintf(stdout, "\[%d\] Running %s \[%d\]\n", la + 1, processes[la].pname, processes[la].pid);
         }
+        if (processes[la].status == 2) {
+            fprintf(stdout, "\[%d\] Moved %s \[%d\] To Foreground\n", la + 1, processes[la].pname, processes[la].pid);
+        }
         la++;
     }
     return 1;    
@@ -40,4 +43,36 @@ int overkill(char** args, char* root) {
         la++;
     }
     return 1;
+}
+
+int run_fg(char** args, char* root) {
+    int count = 0, i = 0;
+    while (args[i] != NULL) {
+        i++;
+        count++;
+    }
+
+    if (count >= 3) {
+        fprintf(stderr, "fg: Too many Arguments\n");
+        return -1;
+    }
+    else if (count <= 1) {
+        fprintf(stderr, "fg: Too few Arguments\n");
+        return -1;
+    }
+    else {
+        int num = atoi(args[1]);
+
+        if (num > running_proc_num) {
+            perror("Process doesn't exist");
+            return -1;
+        }
+        else {
+            printf("%d %d %s\n", num, running_proc_num, processes[num - 1].pname);
+            kill(processes[num - 1].pid, SIGCONT);
+            waitpid(-1, NULL, WUNTRACED);
+            processes[num - 1].status = 2;
+        }
+
+    }
 }

@@ -6,6 +6,7 @@ struct p {
     int pid;
     int status;
     int print_status;
+    int stat;
 };
 
 extern int running_proc_num;
