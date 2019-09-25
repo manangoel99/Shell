@@ -18,5 +18,26 @@ int jobs(char** args, char* root) {
         }
         la++;
     }
-    
+    return 1;    
+}
+
+int overkill(char** args, char* root) {
+    int la = 0;
+
+    while(la < running_proc_num) {
+        if (processes[la].status == 0) {
+            int stat = kill(processes[la].pid, SIGINT);
+
+            if (stat < 0) {
+                perror("Error in Killing process");
+                return -1;
+            }
+            else {
+                fprintf(stdout, "Killed - %s %d\n", processes[la].pname, processes[la].pid);
+            }
+
+        }
+        la++;
+    }
+    return 1;
 }
