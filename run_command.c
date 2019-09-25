@@ -218,6 +218,8 @@ int run_command(char **args,char* root) {
         else {
             processes[running_proc_num].pname = (char*)malloc(sizeof(args[0]));
             processes[running_proc_num].pname = args[0];
+            processes[running_proc_num].status = 0;
+            processes[running_proc_num].print_status = 0;
             // strcpy(processes[running_proc_num].pname, args[0]);
             processes[running_proc_num++].pid = pid;
         }

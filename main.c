@@ -16,6 +16,7 @@
 #include "shell_pinfo.h"
 #include "shell_setenv.h"
 #include "run_command.h"
+#include "shell_jobs.h"
 
 #define ll long long
 
@@ -31,9 +32,11 @@ char *command_arr[] = {
     "nightswatch",
     "setenv",
     "unsetenv",
+    "jobs",
 };
 
 struct p processes[10000];
+int running_proc_num;
 
 void sigintHandler (int sig_num)
 {
@@ -52,7 +55,7 @@ char* root;
 int shell_exit (char **args, char *root);
 int shell_quit(char **args, char *root);
 
-int (*functions[])(char**, char*) = {&shell_cd, &shell_exit, &shell_pwd, &shell_echo, &shell_ls, &shell_quit, &shell_pinfo, &shell_history, &nightswatch, &run_setenv, &run_unsetenv};
+int (*functions[])(char**, char*) = {&shell_cd, &shell_exit, &shell_pwd, &shell_echo, &shell_ls, &shell_quit, &shell_pinfo, &shell_history, &nightswatch, &run_setenv, &run_unsetenv, &jobs};
 
 int shell_exit(char** args, char *root) {
     exit(1);
@@ -84,38 +87,57 @@ void shell_loop(void) {
 
     while(1) {
 
-        int pid, status;
+       
+        int la = 0;
 
-        while((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0) {
-            char* pname;
-            // printf("%d\n", pid);
+        while (la < running_proc_num) {
+            int pid, status;
+            pid = waitpid(processes[la].pid, &status, WNOHANG | WUNTRACED);            
+            // if (WIFEXITED(status)) {
+            //     if (processes[la].print_status == 0) {
+            //         printf("%s\n", processes[la].pname);
+            //         processes[la].print_status = 1;
+            //         processes[la].status = 1;
+            //     }
+            // }
+            if (processes[la].pid == pid) {
+                printf("%s Exited\n", processes[la].pname);
+                processes[la].print_status = 1;
+                processes[la].status = 1;
 
-            if (WIFEXITED(status)) {
-                int la = 0;
-                while (la < running_proc_num) {
-                    pname = processes[la].pname;
-                    fprintf(stderr, "Process %s:%d exited normally\n", pname, processes[la].pid);
-
-                    processes[la].pid = -1;
-
-                    break;
-                    la++;
-
-                }
             }
-            if (WIFSIGNALED(status)) {
-                int la = 0;
-                while (la < running_proc_num) {
-                    pname = processes[la].pname;
-                    fprintf(stderr, "Process %s:%d exited with signal\n", pname, processes[la].pid);
 
-                    processes[la].pid = -1;
-
-                    break;
-                    la++;
-                }
-            }
+            la++;
         }
+
+        // while((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0) {
+        //     char* pname;
+        //     // printf("%d\n", pid);
+
+        //     if (WIFEXITED(status)) {
+        //         int la = 0;
+        //         while (la < running_proc_num) {
+        //             pname = processes[la].pname;
+        //             fprintf(stderr, "Process %s:%d exited normally\n", pname, processes[la].pid);
+
+        //             processes[la].pid = -1;
+        //             la++;
+        //             break;
+
+        //         }
+        //     }
+        //     if (WIFSIGNALED(status)) {
+        //         int la = 0;
+        //         while (la < running_proc_num) {
+        //             pname = processes[la].pname;
+        //             fprintf(stderr, "Process %s:%d exited with signal\n", pname, processes[la].pid);
+
+        //             processes[la].pid = -1;
+        //             la++;
+        //             break;
+        //         }
+        //     }
+        // }
 
 
         PrintShellPrompt(root);

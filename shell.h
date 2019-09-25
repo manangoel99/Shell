@@ -4,6 +4,8 @@
 struct p {
     char* pname;
     int pid;
+    int status;
+    int print_status;
 };
 
 extern int running_proc_num;
