@@ -76,3 +76,36 @@ int run_fg(char** args, char* root) {
 
     }
 }
+
+int run_kjob(char** args, char* root) {
+    int num_args = 0, i = 0;
+
+    while (args[i] != NULL) {
+        i++;
+        num_args++;
+    }
+
+    if (num_args >= 4) {
+        fprintf(stderr, "kjob: Too many Arguments\n");
+        return -1;
+    }
+    else if (num_args <= 2) {
+        fprintf(stderr, "kjob: Too few arguments\n");
+        return -1;
+    }
+    else {
+        int jno = atoi(args[1]);
+        int sig = atoi(args[2]);
+
+        if (jno > running_proc_num) {
+            perror("Process doesn't exist");
+            return -1;
+        }
+        else {
+            kill(processes[jno - 1].pid, sig);
+        }
+
+    }
+    return 1;
+
+}
