@@ -45,7 +45,7 @@ int overkill(char** args, char* root) {
     return 1;
 }
 
-int run_fg(char** args, char* root) {
+int shell_fg(char** args, char* root) {
     int count = 0, i = 0;
     while (args[i] != NULL) {
         i++;
@@ -77,7 +77,7 @@ int run_fg(char** args, char* root) {
     }
 }
 
-int run_kjob(char** args, char* root) {
+int shell_kjob(char** args, char* root) {
     int num_args = 0, i = 0;
 
     while (args[i] != NULL) {
@@ -108,4 +108,39 @@ int run_kjob(char** args, char* root) {
     }
     return 1;
 
+}
+
+int shell_bg(char** args, char* root) {
+    int count = 0, i = 0;
+
+    while (args[i] != NULL) {
+        i++;
+        count++;
+    }
+
+    if (count >= 3) {
+        fprintf(stderr, "bg: Too many Arguments\n");
+        return -1;
+    }
+    else if (count <= 1) {
+        fprintf(stderr, "bg: Too few Arguments\n");
+        return -1;
+    }
+    else {
+        int jno = atoi(args[1]);
+
+        if (jno > running_proc_num) {
+            perror("Process Doesn't Exist");
+            return -1;
+        }
+        else {
+            kill(processes[jno - 1].pid, SIGTTIN);
+            kill(processes[jno - 1].pid, SIGCONT);
+
+            processes[jno - 1].status = 0;
+            processes[jno - 1].print_status = 0;
+
+        }
+    }
+    return 1;
 }

@@ -21,5 +21,6 @@ struct p processes[10000];
 
 int jobs(char** args, char* root);
 int overkill(char** args, char* root);
-int run_fg(char** args, char* root);
-int run_kjob(char** args, char* root);
+int shell_fg(char** args, char* root);
+int shell_bg(char** args, char* root);
+int shell_kjob(char** args, char* root);

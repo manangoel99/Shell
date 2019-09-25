@@ -36,6 +36,7 @@ char *command_arr[] = {
     "overkill",
     "fg",
     "kjob",
+    "bg",
 };
 
 struct p processes[10000];
@@ -72,8 +73,9 @@ int (*functions[])(char**, char*) = {
     &run_unsetenv, 
     &jobs, 
     &overkill, 
-    &run_fg,
-    &run_kjob,
+    &shell_fg,
+    &shell_kjob,
+    &shell_bg,
 };
 
 int shell_exit(char** args, char *root) {
