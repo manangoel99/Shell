@@ -5,6 +5,7 @@
 
 int running_proc_num = 0;
 struct p processes[10000];
+pid_t current_running_proc;
 
 char** redirectCode(char** args, int* isin_p, int* isout_p, int* infd_p, int* outfd_p, int* pos_p);
 
@@ -34,22 +35,19 @@ int run_command(char **args,char* root) {
         args = args1;
     }
     pid = fork();
+    current_running_proc = pid;
+
     if (pid < 0) {
         perror("Error");
     }
     else if (pid == 0) {
-        /* if (background == 0) {
-            int n = execvp(args[0], args);
-            if (n < 0) {
-                perror("Error");
+        if (background == 1) {
+            if (setpgid(0, 0) == 0) {}
+            else {
+                perror("Can't Start Background Process");
+                exit(1);
             }
         }
-        else {
-            int n = execvp(args[0], args1);
-            if (n < 0) {
-                perror("Error");
-            }
-        } */
         int pipe_flag = 0;
         char*** all_args = (char***)malloc(sizeof(char**) * 128);
 
@@ -205,15 +203,7 @@ int run_command(char **args,char* root) {
     else if (pid > 0) {
         int state;
         if (background == 0) {
-            pid_t w = waitpid(pid, &state, WUNTRACED);
-        // while(1) {
-            // if (!(WIFEXITED(state) || WIFSIGNALED(state))) {
-                // w = waitpid(pid, &state, WUNTRACED);
-                // printf("%d\n", state);
-                // continue;
-            // }
-            // break;
-        // }
+            pid_t w = waitpid(-1, NULL, WUNTRACED);
         }
         else {
             char* command = (char*)malloc(1280);
@@ -233,6 +223,8 @@ int run_command(char **args,char* root) {
             processes[running_proc_num].stat = 1;
             // strcpy(processes[running_proc_num].pname, args[0]);
             processes[running_proc_num++].pid = pid;
+            kill(pid, SIGTTIN);
+            kill(pid, SIGCONT);
         }
     }
     

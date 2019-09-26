@@ -2,6 +2,7 @@
 
 struct p processes[10000];
 int running_proc_num;
+pid_t current_running_proc;
 
 int jobs(char** args, char* root) {
     int la = 0;
@@ -29,7 +30,7 @@ int overkill(char** args, char* root) {
 
     while(la < running_proc_num) {
         if (processes[la].status == 0) {
-            int stat = kill(processes[la].pid, SIGSTOP);
+            int stat = kill(processes[la].pid, SIGINT);
 
             if (stat < 0) {
                 perror("Error in Killing process");
@@ -70,6 +71,7 @@ int shell_fg(char** args, char* root) {
         else {
             // printf("%d %d %s\n", num, running_proc_num, processes[num - 1].pname);
             kill(processes[num - 1].pid, SIGCONT);
+            current_running_proc = processes[num - 1].pid;
             waitpid(-1, NULL, WUNTRACED);
             processes[num - 1].status = 2;
         }

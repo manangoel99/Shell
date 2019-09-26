@@ -41,10 +41,14 @@ char *command_arr[] = {
 
 struct p processes[10000];
 int running_proc_num;
+pid_t current_running_proc = -1;
+pid_t shell_pid = -1;
 
 void sigintHandler (int sig_num)
 {
 	signal(SIGINT, sigintHandler);
+    if (current_running_proc != -1)
+        printf("\nKilled %d\n", current_running_proc);
 	fflush(stdout);
 }
 
@@ -52,6 +56,22 @@ void sigtstpHandler(int sig_num)
 { 
 	signal(SIGTSTP, sigtstpHandler);
 }
+
+// void C_Signal(int sig) {
+//     if (getpid() != shell_pid) {
+//         return;
+//     }
+
+//     printf("Caught C\n");
+
+//     if (current_running_proc != -1) {
+//         printf("LOL\n%d\t%d\n", current_running_proc, shell_pid);
+
+//         // kill(current_running_proc, SIGINT);
+//     }
+//     signal(SIGINT, C_Signal);
+//     printf("LOLSKI\n");
+// }
 
 
 char* root;
@@ -107,58 +127,39 @@ void shell_loop(void) {
     int state;
 
     while(1) {
-
+        current_running_proc = -1;
        
         int la = 0;
 
+        // while (la < running_proc_num) {
+        //     int pid, status;
+        //     pid = waitpid(processes[la].pid, &status, WNOHANG | WUNTRACED);            
+        //     // if (WIFEXITED(status)) {
+        //     //     if (processes[la].print_status == 0) {
+        //     //         printf("%s\n", processes[la].pname);
+        //     //         processes[la].print_status = 1;
+        //     //         processes[la].status = 1;
+        //     //     }
+        //     // }
+        //     if (processes[la].pid == pid) {
+        //         printf("%s Exited\n", processes[la].pname);
+        //         processes[la].print_status = 1;
+        //         processes[la].status = 1;
+
+        //     }
+
+        //     la++;
+        // }
+        int status;
+        pid_t pid;
+
         while (la < running_proc_num) {
-            int pid, status;
-            pid = waitpid(processes[la].pid, &status, WNOHANG | WUNTRACED);            
-            // if (WIFEXITED(status)) {
-            //     if (processes[la].print_status == 0) {
-            //         printf("%s\n", processes[la].pname);
-            //         processes[la].print_status = 1;
-            //         processes[la].status = 1;
-            //     }
-            // }
-            if (processes[la].pid == pid) {
-                printf("%s Exited\n", processes[la].pname);
-                processes[la].print_status = 1;
-                processes[la].status = 1;
-
+            pid_t p = waitpid(processes[la].pid, &status, WNOHANG);
+            if (p == processes[la].pid) {
+                printf("%s Exited : %d\n", processes[la].pname, processes[la].pid);
             }
-
             la++;
         }
-
-        // while((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0) {
-        //     char* pname;
-        //     // printf("%d\n", pid);
-
-        //     if (WIFEXITED(status)) {
-        //         int la = 0;
-        //         while (la < running_proc_num) {
-        //             pname = processes[la].pname;
-        //             fprintf(stderr, "Process %s:%d exited normally\n", pname, processes[la].pid);
-
-        //             processes[la].pid = -1;
-        //             la++;
-        //             break;
-
-        //         }
-        //     }
-        //     if (WIFSIGNALED(status)) {
-        //         int la = 0;
-        //         while (la < running_proc_num) {
-        //             pname = processes[la].pname;
-        //             fprintf(stderr, "Process %s:%d exited with signal\n", pname, processes[la].pid);
-
-        //             processes[la].pid = -1;
-        //             la++;
-        //             break;
-        //         }
-        //     }
-        // }
 
 
         PrintShellPrompt(root);
@@ -232,15 +233,11 @@ void shell_loop(void) {
                 last_num = 0;
             }
 
-
-
-
             FILE* hist_file_write = fopen(temp, "a");
             fprintf(hist_file_write, "%d %s\n", last_num + 1, command);
             fclose(hist_file_write);
             free(command);
             free(temp);
-
             k++;
         }
         
@@ -251,6 +248,7 @@ int main(void) {
 
     signal(SIGINT, sigintHandler);
 	signal(SIGTSTP, sigtstpHandler);
+    shell_pid = getpid();
 
     root = getenv("PWD");
     shell_loop();
