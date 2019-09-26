@@ -53,8 +53,37 @@ void sigintHandler (int sig_num)
 }
 
 void sigtstpHandler(int sig_num) 
-{ 
+{
+    // p = itoa current_running_proc
+    if (current_running_proc != -1) {
+        char* p = (char*)malloc(100);
+        sprintf(p, "%d", current_running_proc);
+
+        char* proc = (char*)malloc(1000);
+        sprintf(proc, "/proc/%s/stat", p);
+
+        FILE* stat_file = fopen(proc, "r");
+
+        if (stat_file == NULL) {
+            fprintf(stderr, "Error reading %s", proc);
+        }
+        int p_id;
+    
+        char status, *name = (char*)malloc(1000);
+        fscanf(stat_file, "%d", &p_id);
+        fscanf(stat_file, "%s", name);
+
+        processes[running_proc_num].pname = (char*)malloc(sizeof(name));
+        processes[running_proc_num].pname = name;
+        processes[running_proc_num].status = 1;
+        processes[running_proc_num].print_status = 0;
+        processes[running_proc_num].stat = 1;
+        processes[running_proc_num++].pid = p_id;
+        // printf("%s\n", name);
+
+    }
 	signal(SIGTSTP, sigtstpHandler);
+
 }
 
 // void C_Signal(int sig) {

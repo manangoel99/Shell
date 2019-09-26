@@ -37,7 +37,7 @@ int overkill(char** args, char* root) {
                 return -1;
             }
             else {
-                fprintf(stdout, "Suspended - %s %d\n", processes[la].pname, processes[la].pid);
+                fprintf(stdout, "Killed - %s %d\n", processes[la].pname, processes[la].pid);
             }
 
         }
