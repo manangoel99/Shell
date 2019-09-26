@@ -29,14 +29,14 @@ int overkill(char** args, char* root) {
 
     while(la < running_proc_num) {
         if (processes[la].status == 0) {
-            int stat = kill(processes[la].pid, SIGINT);
+            int stat = kill(processes[la].pid, SIGSTOP);
 
             if (stat < 0) {
                 perror("Error in Killing process");
                 return -1;
             }
             else {
-                fprintf(stdout, "Killed - %s %d\n", processes[la].pname, processes[la].pid);
+                fprintf(stdout, "Suspended - %s %d\n", processes[la].pname, processes[la].pid);
             }
 
         }
@@ -68,7 +68,7 @@ int shell_fg(char** args, char* root) {
             return -1;
         }
         else {
-            printf("%d %d %s\n", num, running_proc_num, processes[num - 1].pname);
+            // printf("%d %d %s\n", num, running_proc_num, processes[num - 1].pname);
             kill(processes[num - 1].pid, SIGCONT);
             waitpid(-1, NULL, WUNTRACED);
             processes[num - 1].status = 2;
