@@ -86,22 +86,6 @@ void sigtstpHandler(int sig_num)
 
 }
 
-// void C_Signal(int sig) {
-//     if (getpid() != shell_pid) {
-//         return;
-//     }
-
-//     printf("Caught C\n");
-
-//     if (current_running_proc != -1) {
-//         printf("LOL\n%d\t%d\n", current_running_proc, shell_pid);
-
-//         // kill(current_running_proc, SIGINT);
-//     }
-//     signal(SIGINT, C_Signal);
-//     printf("LOLSKI\n");
-// }
-
 int check_up(char* command) {
     int i;
     while (command[i] != '\0') {
@@ -218,25 +202,6 @@ void shell_loop(void) {
        
         int la = 0;
 
-        // while (la < running_proc_num) {
-        //     int pid, status;
-        //     pid = waitpid(processes[la].pid, &status, WNOHANG | WUNTRACED);            
-        //     // if (WIFEXITED(status)) {
-        //     //     if (processes[la].print_status == 0) {
-        //     //         printf("%s\n", processes[la].pname);
-        //     //         processes[la].print_status = 1;
-        //     //         processes[la].status = 1;
-        //     //     }
-        //     // }
-        //     if (processes[la].pid == pid) {
-        //         printf("%s Exited\n", processes[la].pname);
-        //         processes[la].print_status = 1;
-        //         processes[la].status = 1;
-
-        //     }
-
-        //     la++;
-        // }
         int status;
         pid_t pid;
 
@@ -305,7 +270,6 @@ void shell_loop(void) {
             int i = 0;
             int flag = 0;
             while (i < sizeof(command_arr) / sizeof(char*)) {
-                // printf("%d %d\n", strlen(command_arr[i]), strlen(comm_toks[0]));
                 if (strcmp(command_arr[i], comm_toks[0]) == 0 && flag1 == 0) {
                     int num = (*functions[i])(comm_toks, root);
                     flag = 1;
@@ -334,7 +298,6 @@ void shell_loop(void) {
 
                 fseek(hist_file, 0, SEEK_END);
                 size = ftell(hist_file);
-                // last_num;
                 token = strtok(str, " ");
                 last_num = atoi(token);
                 fclose(hist_file);
