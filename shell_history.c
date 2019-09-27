@@ -1,7 +1,6 @@
 #include "shell_history.h"
 
 int shell_history(char** args, char* root) {
-    // printf("HAHAH\n");
     char* hist_file_path = (char*)malloc(1000);
     strcpy(hist_file_path, root);
     strcat(hist_file_path, "/.history");

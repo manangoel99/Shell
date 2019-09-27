@@ -37,10 +37,12 @@ char *command_arr[] = {
     "fg",
     "kjob",
     "bg",
+    "cronjob",
 };
 
 struct p processes[10000];
 int running_proc_num;
+struct cron crons[10000];
 pid_t current_running_proc = -1;
 pid_t shell_pid = -1;
 
@@ -85,6 +87,7 @@ void sigtstpHandler(int sig_num)
 	signal(SIGTSTP, sigtstpHandler);
 
 }
+
 
 int check_up(char* command) {
     int i;
@@ -149,6 +152,7 @@ char* root;
 
 int shell_exit (char **args, char *root);
 int shell_quit(char **args, char *root);
+int cronjob(char **args, char* root);
 
 int (*functions[])(char**, char*) = {
     &shell_cd, 
@@ -167,6 +171,7 @@ int (*functions[])(char**, char*) = {
     &shell_fg,
     &shell_kjob,
     &shell_bg,
+    &cronjob,
 };
 
 int shell_exit(char** args, char *root) {
@@ -189,6 +194,120 @@ char* PrintShellPrompt(char* root, char* prev_command) {
     char* path = getPath(cwd, root);
 
     printf("<%s@%s %s> $ %s ", username, hostname, path, prev_command);
+}
+
+int cronjob(char** args, char* root) {
+    int i = 0;
+    char* comm = (char*)malloc(200);
+    strcpy(comm, "");
+    int time_interval, time_period;
+    int flag_c = 0;
+    int flag_p = 0;
+    int flag_t = 0;
+
+    while (args[i] != NULL) {
+        if (strcmp(args[i], "-c") == 0) {
+            int j = i + 1;
+            while (args[j] != NULL) {
+
+                if (strcmp(args[j], "-p") == 0) {
+                    break;
+                }
+                if (strcmp(args[j], "-t") == 0) {
+                    break;
+                }
+                strcat(comm, args[j]);
+                strcat(comm, " ");
+                j++;
+            }
+            comm[strlen(comm) - 1] = '\0';
+            flag_c = 1;
+        }
+        if (strcmp(args[i], "-p") == 0) {
+            flag_p = 1;
+            time_period = atoi(args[i + 1]);
+        }
+        if (strcmp(args[i], "-t") == 0) {
+            flag_t = 1;
+            time_interval = atoi(args[i + 1]);
+        }
+        i++;
+    }
+
+    if (flag_p == 0 || flag_c == 0 || flag_t == 0) {
+        fprintf(stderr, "Not Enough Arguments\n");
+        return -1;
+    }
+    struct cron c;
+    time_t n;
+    time(&n);
+    c.pname = comm;
+    c.command = comm;
+    // printf("%s\n", c.command);
+    c.time_interval = time_interval;
+    c.time_limit = time_period;
+    c.start_time = n;
+    pid_t pid = fork();
+    if (pid == 0) {
+        char** comm_toks = (char**)malloc(1000);
+        comm_toks = SplitCommand(c.command);
+        int d = 0;
+        int up_press = check_up(c.command);
+        int flag1 = 0;
+        if (up_press > 0) {
+            c.command = get_nth_command(up_press, root);
+            PrintShellPrompt(root, c.command);
+            printf("\n");
+            comm_toks = SplitCommand(c.command);
+            int l = 0;
+            while(comm_toks[l] != NULL) {
+                if (strcmp(comm_toks[l], "|") == 0 || strcmp(comm_toks[l], ">") == 0 || strcmp(comm_toks[l], ">>") == 0 || strcmp(comm_toks[l], "<") == 0) {
+                    flag1 = 1;
+                }
+                l++;
+            }
+        }
+        int l = 0;
+        while(comm_toks[l] != NULL) {
+            l++;
+        }
+        while (1) {
+            time_t now;
+            time(&now);
+
+            if (now - c.start_time > c.time_limit) {
+                printf("\n");
+                PrintShellPrompt(root, "");
+                exit(1);
+            }
+            else {
+                if ((now - c.start_time) % c.time_interval == 0) {
+                    printf("\n");
+                    int i = 0;
+                    int flag = 0;
+                    while (i < sizeof(command_arr) / sizeof(char*)) {
+                        if (strcmp(command_arr[i], comm_toks[0]) == 0 && flag1 == 0) {
+                            // printf("HAHAH\n");
+                            int num = (*functions[i])(comm_toks, root);
+                            flag = 1;
+                        }
+                        i++;
+                    }
+                    if (flag == 0 || flag1 == 1){
+                        int num = run_command(comm_toks, root);
+                    }
+                }
+
+            }
+            sleep(1);
+
+        }
+    }
+    else {
+        pid_t w = waitpid(-1, NULL, WNOHANG);
+        chdir(current_working_dir);
+    }
+    return 1;
 }
 
 void shell_loop(void) {
@@ -219,17 +338,12 @@ void shell_loop(void) {
         if (strlen(comm) == 0) {
             continue;
         }
-        // printf("%s\n", comm);
 
         char** comm_tokens = SplitCommands(comm);
 
         int k = 0;
 
         while (comm_tokens[k] != NULL) {
-            
-            // for (ll j = 0; comm_tokens[k][j] != '\0'; j++) {
-            //     printf("%c HAHA\t", comm_tokens[k][j]);
-            // }
             char* command = (char*)malloc(1000);
             strcpy(command, "");
 
@@ -315,7 +429,7 @@ void shell_loop(void) {
             free(temp);
             k++;
         }
-        
+        chdir(current_working_dir);
     }
 }
 
@@ -323,6 +437,8 @@ int main(void) {
 
     signal(SIGINT, sigintHandler);
 	signal(SIGTSTP, sigtstpHandler);
+    current_working_dir = (char*)malloc(1000);
+    getcwd(current_working_dir, 250);
     shell_pid = getpid();
 
     root = getenv("PWD");
