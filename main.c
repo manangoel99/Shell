@@ -305,7 +305,7 @@ int cronjob(char** args, char* root) {
     }
     else {
         pid_t w = waitpid(-1, NULL, WNOHANG);
-        chdir(current_working_dir);
+        // chdir(current_working_dir);
     }
     return 1;
 }
@@ -429,7 +429,7 @@ void shell_loop(void) {
             free(temp);
             k++;
         }
-        chdir(current_working_dir);
+        // chdir(current_working_dir);
     }
 }
 
@@ -437,8 +437,8 @@ int main(void) {
 
     signal(SIGINT, sigintHandler);
 	signal(SIGTSTP, sigtstpHandler);
-    current_working_dir = (char*)malloc(1000);
-    getcwd(current_working_dir, 250);
+    // current_working_dir = (char*)malloc(1000);
+    // getcwd(current_working_dir, 250);
     shell_pid = getpid();
 
     root = getenv("PWD");

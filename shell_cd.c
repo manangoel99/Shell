@@ -1,6 +1,6 @@
 #include "shell_cd.h"
 #include "shell.h"
-char* current_working_dir;
+// char* current_working_dir;
 void* dir_ptr;
 
 int shell_cd(char** args, char* root) {
@@ -73,8 +73,8 @@ int shell_cd(char** args, char* root) {
 
         }
     }
-    getcwd(current_working_dir, 250);
-    sprintf(dir_ptr, "%s", current_working_dir);
+    // getcwd(current_working_dir, 250);
+    // sprintf(dir_ptr, "%s", current_working_dir);
     
 
     

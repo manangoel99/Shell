@@ -12,13 +12,13 @@ int jobs(char** args, char* root) {
         // fprintf(stdout, "%s %d\n", processes[la].pname, processes[la].pid);
         // fprintf(stdout, "\[%d\] ")
         if (processes[la].status == 1) {
-            fprintf(stdout, "\[%d\] Stopped %s \[%d\]\n", la + 1, processes[la].pname, processes[la].pid);
+            fprintf(stdout, "[%d] Stopped %s [%d]\n", la + 1, processes[la].pname, processes[la].pid);
         }
         if (processes[la].status == 0) {
-            fprintf(stdout, "\[%d\] Running %s \[%d\]\n", la + 1, processes[la].pname, processes[la].pid);
+            fprintf(stdout, "[%d] Running %s [%d]\n", la + 1, processes[la].pname, processes[la].pid);
         }
         if (processes[la].status == 2) {
-            fprintf(stdout, "\[%d\] Moved %s \[%d\] To Foreground\n", la + 1, processes[la].pname, processes[la].pid);
+            fprintf(stdout, "[%d] Moved %s [%d] To Foreground\n", la + 1, processes[la].pname, processes[la].pid);
         }
         la++;
     }
