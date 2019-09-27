@@ -56,6 +56,7 @@ void sigtstpHandler(int sig_num)
 {
     // p = itoa current_running_proc
     if (current_running_proc != -1) {
+        printf("\n Suspened %d\n", current_running_proc);
         char* p = (char*)malloc(100);
         sprintf(p, "%d", current_running_proc);
 
@@ -79,7 +80,6 @@ void sigtstpHandler(int sig_num)
         processes[running_proc_num].print_status = 0;
         processes[running_proc_num].stat = 1;
         processes[running_proc_num++].pid = p_id;
-        // printf("%s\n", name);
 
     }
 	signal(SIGTSTP, sigtstpHandler);
@@ -101,6 +101,64 @@ void sigtstpHandler(int sig_num)
 //     signal(SIGINT, C_Signal);
 //     printf("LOLSKI\n");
 // }
+
+int check_up(char* command) {
+    int i;
+    while (command[i] != '\0') {
+        if (i % 3 == 0 && command[i] != '~') {
+            return -1;
+        }
+        if (i % 3 == 1 && command[i] != '[') {
+            return -1;
+        }
+        if (i % 3 == 2 && command[i] != 'A') {
+            return -1;
+        } 
+        i++;
+    }
+
+    int count = 0;
+    const char* temp = command;
+    while (temp = strstr(temp, "~[A")) {
+        count++;
+        temp++;
+    }
+    return count;
+}
+
+char* get_nth_command(int n, char* root) {
+    char* hist_file_path = (char*)malloc(1000);
+    strcpy(hist_file_path, root);
+    strcat(hist_file_path, "/.history");
+
+    FILE* hist_file = fopen(hist_file_path, "r");
+
+    char** commands = (char**)malloc(1000*sizeof(char*));
+    int i = 0;
+    int length = 0;
+
+    commands[i] = (char*)malloc(1000);
+    while (fgets(commands[i], 1000, hist_file) != NULL) {
+        i++;
+        commands[i] = (char*)malloc(1000);
+    }
+
+    int j = i - 1;
+    char* tok = strtok(commands[j - n + 1], " ");
+    tok = strtok(NULL, " ");
+    char* comm = (char*)malloc(1000);
+    strcpy(comm, "");
+    while (tok != NULL) {
+        strcat(comm, tok);
+        strcat (comm, " ");
+        tok = strtok(NULL, " ");
+    }
+
+    length = strlen(comm);
+    comm [length - 2] = '\0';
+
+    return comm;
+}
 
 
 char* root;
@@ -136,7 +194,7 @@ int shell_quit(char** args, char *root) {
 }
 
 
-char* PrintShellPrompt(char* root) {
+char* PrintShellPrompt(char* root, char* prev_command) {
     char* hostname = (char*)malloc(1024);
     char* username = getenv("USER");
     char* cwd = (char*)malloc(8192);
@@ -146,7 +204,7 @@ char* PrintShellPrompt(char* root) {
 
     char* path = getPath(cwd, root);
 
-    printf("<%s@%s %s> $ ", username, hostname, path);
+    printf("<%s@%s %s> $ %s ", username, hostname, path, prev_command);
 }
 
 void shell_loop(void) {
@@ -191,18 +249,22 @@ void shell_loop(void) {
         }
 
 
-        PrintShellPrompt(root);
+        PrintShellPrompt(root, "");
         char* comm = getCommands();
         if (strlen(comm) == 0) {
             continue;
         }
+        // printf("%s\n", comm);
 
         char** comm_tokens = SplitCommands(comm);
 
         int k = 0;
 
         while (comm_tokens[k] != NULL) {
-
+            
+            // for (ll j = 0; comm_tokens[k][j] != '\0'; j++) {
+            //     printf("%c HAHA\t", comm_tokens[k][j]);
+            // }
             char* command = (char*)malloc(1000);
             strcpy(command, "");
 
@@ -219,10 +281,31 @@ void shell_loop(void) {
                 strcat(command, " ");
             }
             command[strlen(command) - 1] = '\0';
+            // printf("%s\n", command);
+
+            int up_press = check_up(command);
+            // printf("%d\n", up_press);
+
+            if (up_press > 0) {
+                command = get_nth_command(up_press, root);
+                PrintShellPrompt(root, command);
+                printf("\n");
+                comm_toks = SplitCommand(command);
+                l = 0;
+                while(comm_toks[l] != NULL) {
+
+                    if (strcmp(comm_toks[l], "|") == 0 || strcmp(comm_toks[l], ">") == 0 || strcmp(comm_toks[l], ">>") == 0 || strcmp(comm_toks[l], "<") == 0) {
+                        flag1 = 1;
+                    }
+                    l++;
+                }
+            
+            }
 
             int i = 0;
             int flag = 0;
             while (i < sizeof(command_arr) / sizeof(char*)) {
+                // printf("%d %d\n", strlen(command_arr[i]), strlen(comm_toks[0]));
                 if (strcmp(command_arr[i], comm_toks[0]) == 0 && flag1 == 0) {
                     int num = (*functions[i])(comm_toks, root);
                     flag = 1;

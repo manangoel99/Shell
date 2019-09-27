@@ -1,5 +1,6 @@
 #include "getCommand.h"
 #define ll long long
+#define KEY_UP 72
 
 char** SplitCommand(char* command_str) {
 
@@ -45,9 +46,14 @@ char* getCommands() {
 
     while(1) {
         char character = getchar();
+        // printf("%c %d\t", character, character);
         if (character == '\n' || character == EOF) {
+            // printf("%c\nLOLOL\n", character);
             command_str[pos] = '\0';
             break;
+        }
+        if (character == 27) {
+            command_str[pos] = '~';
         }
         else {
             command_str[pos] = character;
