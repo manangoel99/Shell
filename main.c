@@ -90,7 +90,8 @@ void sigtstpHandler(int sig_num)
 
 
 int check_up(char* command) {
-    int i;
+    int i = 0;
+
     while (command[i] != '\0') {
         if (i % 3 == 0 && command[i] != '~') {
             return -1;
